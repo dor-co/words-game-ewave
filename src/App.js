@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { message, Button } from "antd";
+import { useNavigate } from "react-router-dom";
 import "./index.scss";
 
 const targetWords = ["test", "wordsf", "ply", "rea", "d"];
@@ -21,6 +22,7 @@ const App = () => {
   const [currentAttempt, setCurrentAttempt] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
 
   const inputRefs = useRef(
     Array(attempts)
@@ -121,9 +123,16 @@ const App = () => {
     }
   };
 
+  const onBackToLobby = () => {
+    navigate("/");
+  };
+
   return (
     <div className="container">
       {contextHolder}
+      <Button onClick={onBackToLobby} className="back-to-lobby-btn">
+        חזרה ללובי
+      </Button>
       {!isGameOver ? (
         <div className="input-grid">
           {inputs.map((row, rowIndex) => (
