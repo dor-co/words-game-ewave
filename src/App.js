@@ -3,7 +3,7 @@ import { message, Button } from "antd";
 import "./index.scss";
 
 const targetWords = ["test", "wordsf", "ply", "rea", "d"];
-const attempts = 5;
+const attempts = 6;
 
 const App = () => {
   const [level, setLevel] = useState(0);
