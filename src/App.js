@@ -1,34 +1,62 @@
-import React, { useState, useRef } from "react";
-import { message, Button } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { message, Button, Modal } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./index.scss";
+import Results from "./Results";
 
-const targetWords = ["test", "wordsf", "ply", "rea", "d"];
 const attempts = 6;
+const numberOfGroups = 4;
 
 const App = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { game } = location.state;
   const [level, setLevel] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [inputs, setInputs] = useState(
     Array(attempts)
       .fill("")
-      .map(() => Array(targetWords[level].length).fill(""))
+      .map(() => Array(game.words[level].length).fill(""))
   );
   const [results, setResults] = useState(
     Array(attempts)
       .fill("")
-      .map(() => Array(targetWords[level].length).fill(""))
+      .map(() => Array(game.words[level].length).fill(""))
   );
   const [currentAttempt, setCurrentAttempt] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [finalScore, setFinalScore] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
-  const navigate = useNavigate();
+
+  const [currentGroupScores, setCurrentGroupScores] = useState(new Array(4).fill(0));
+  const [groupNames, setGroupNames] = useState(['קבוצה 1', 'קבוצה 2', 'קבוצה 3', 'קבוצה 4']);
+  const [currentGroupName, setCurrentGroupName] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const updateGroupScore = (groupIndex, score) => {
+    const scores = sessionStorage.getItem('score').split(',').map(Number);
+    const newScores = [...scores];
+    newScores[groupIndex] += score;
+    sessionStorage.setItem('score', newScores);
+  };
 
   const inputRefs = useRef(
     Array(attempts)
       .fill("")
       .map(() =>
-        Array(targetWords[level].length)
+        Array(game.words[level].length)
           .fill(null)
           .map(() => React.createRef())
       )
@@ -41,13 +69,17 @@ const App = () => {
     setInputs(newInputs);
 
     // Move to the next input if available
-    if (colIndex < targetWords[level].length - 1) {
+    if (colIndex < game.words[level].length - 1) {
       const nextInputRef = inputRefs.current[rowIndex][colIndex + 1];
       if (nextInputRef && nextInputRef.current) {
         nextInputRef.current.focus();
       }
     }
   };
+
+  useEffect(() => {
+    setCurrentGroupName(groupNames[level % groupNames.length]);
+  }, [level, groupNames]);
 
   const checkInputs = () => {
     if (currentAttempt >= attempts) return;
@@ -58,15 +90,14 @@ const App = () => {
         type: "error",
         content: "לא מולאו כל האותיות",
       });
-      // alert("Please fill in all inputs before checking.");
       return;
     }
 
     const newResults = [...results];
     const newRowResults = currentInputs.map((input, index) => {
-      if (input === targetWords[level][index]) {
+      if (input === game.words[level][index]) {
         return "green";
-      } else if (targetWords[level].includes(input)) {
+      } else if (game.words[level].includes(input)) {
         return "yellow";
       } else {
         return "";
@@ -76,39 +107,48 @@ const App = () => {
     newResults[currentAttempt] = newRowResults;
     setResults(newResults);
 
-    if (currentInputs.join("") === targetWords[level]) {
-      //alert("Congratulations! You guessed the word!");
+    if (currentInputs.join("") === game.words[level]) {
+      const score = calculateScore(currentAttempt);
+      setFinalScore(score);
+
+      const groupIndex = level % numberOfGroups;
+      updateGroupScore(groupIndex, score);
+
       setGameOver(true);
     } else if (currentAttempt === attempts - 1) {
-      //alert(`Game over! The correct word was "${targetWords[level]}".`);
       setGameOver(true);
     }
 
     setCurrentAttempt(currentAttempt + 1);
   };
 
+  const calculateScore = (attemptIndex) => {
+    return attempts - attemptIndex;
+  };
+
   const nextLevel = () => {
     const nextLevel = level + 1;
-    if (nextLevel < targetWords.length) {
+    if (nextLevel < game.words.length) {
       setLevel(nextLevel);
       setInputs(
         Array(attempts)
           .fill("")
-          .map(() => Array(targetWords[nextLevel].length).fill(""))
+          .map(() => Array(game.words[nextLevel].length).fill(""))
       );
       setResults(
         Array(attempts)
           .fill("")
-          .map(() => Array(targetWords[nextLevel].length).fill(""))
+          .map(() => Array(game.words[nextLevel].length).fill(""))
       );
       setCurrentAttempt(0);
       setGameOver(false);
+      setFinalScore(null);
 
       // Reset inputRefs for new level
       inputRefs.current = Array(attempts)
         .fill("")
         .map(() =>
-          Array(targetWords[nextLevel].length)
+          Array(game.words[nextLevel].length)
             .fill(null)
             .map(() => React.createRef())
         );
@@ -119,7 +159,6 @@ const App = () => {
       }
     } else {
       setIsGameOver(true);
-      //alert("Congratulations! You have completed all levels!");
     }
   };
 
@@ -133,6 +172,8 @@ const App = () => {
       <Button onClick={onBackToLobby} className="back-to-lobby-btn">
         חזרה ללובי
       </Button>
+      <h1 className="my-h1">קטגוריה: {game.category}</h1>
+      <h2 className="my-h2">קבוצה משחקת: {currentGroupName}</h2>
       {!isGameOver ? (
         <div className="input-grid">
           {inputs.map((row, rowIndex) => (
@@ -163,9 +204,14 @@ const App = () => {
               בדוק מילה
             </Button>
           ) : (
-            <Button className="my-button" onClick={nextLevel}>
-              עבור למילה הבא
-            </Button>
+            <div>
+              <Button className="my-button" onClick={showModal}>
+                עבור למילה הבא
+              </Button>
+              <Modal open={isModalOpen} onOk={nextLevel} onCancel={handleCancel}>
+                <Results groups={groupNames} scores={currentGroupScores} />
+              </Modal>
+            </div>
           )}
         </div>
       ) : (

@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Welcome = () => {
@@ -36,11 +36,16 @@ const Welcome = () => {
     "גדעון",
   ];
 
-  const navigate = useNavigate();
+  const gamesList = [
+    { category: 'Category 1', words: ['wo', 'word2'] },
+    { category: 'Category 2', words: ['word-asd4', 'dsword5', 'w6'] },
+    { category: 'Category 3', words: ['worasdd7', 'word8', 'wordsds9'] },
+    { category: 'Category 4', words: ['d10', 'word11', 'word12'] },
+    { category: 'Category 5', words: ['word13', 'word14', 'word15'] }
+  ];
 
-  const onStartGame = () => {
-    navigate("/game");
-  };
+  const navigate = useNavigate();
+  const numberOfGroups = 4;
 
   const shuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -60,19 +65,32 @@ const Welcome = () => {
     return result;
   };
 
-  const numberOfGroups = 4;
-  const groupsList = splitIntoMultipleArrays(names, numberOfGroups);
+  const [groupsList, setGroupsList] = useState([]);
 
-  console.log(groupsList);
+  useEffect(() => {
+    sessionStorage.setItem('score', "0,0,0,0");
+
+    const storedGroups = sessionStorage.getItem('groupsList');
+    if (storedGroups) {
+      setGroupsList(JSON.parse(storedGroups));
+    } else {
+      const newGroupsList = splitIntoMultipleArrays(names, numberOfGroups);
+      sessionStorage.setItem('groupsList', JSON.stringify(newGroupsList));
+      setGroupsList(newGroupsList);
+    }
+  }, []);
+
+  const onStartGame = (game) => {
+    navigate("/game", { state: { game } });
+  };
 
   return (
     <div className="lobby-container">
       <h1 className="my-h1">לובי משחק</h1>
-
       <h2 className="my-h2">קבוצות:</h2>
       <div className="groups-container">
         {groupsList.map((group, groupIndex) => (
-          <div className="group-container">
+          <div key={groupIndex} className="group-container">
             <span className="groud-title">קבוצה {groupIndex + 1}</span>
             {group.map((name, nameIndex) => (
               <span key={nameIndex}>{name} </span>
@@ -81,9 +99,17 @@ const Welcome = () => {
         ))}
       </div>
 
-      <Button className="start-game-btn" onClick={onStartGame}>
-        למשחק
-      </Button>
+      <div className="button-container">
+        {gamesList.map((game, index) => (
+          <Button
+            key={index}
+            className="start-game-btn"
+            onClick={() => onStartGame(game)}
+          >
+            {game.category}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 };
