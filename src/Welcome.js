@@ -37,11 +37,11 @@ const Welcome = () => {
   ];
 
   const gamesList = [
-    { category: 'Category 1', words: ['wo', 'word2'] },
-    { category: 'Category 2', words: ['word-asd4', 'dsword5', 'w6'] },
-    { category: 'Category 3', words: ['worasdd7', 'word8', 'wordsds9'] },
-    { category: 'Category 4', words: ['d10', 'word11', 'word12'] },
-    { category: 'Category 5', words: ['word13', 'word14', 'word15'] }
+    { category: "Category 1", words: ["wo", "word2"] },
+    { category: "Category 2", words: ["word-asd4", "dsword5", "w6"] },
+    { category: "Category 3", words: ["worasdd7", "word8", "wordsds9"] },
+    { category: "Category 4", words: ["d10", "word11", "word12"] },
+    { category: "Category 5", words: ["word13", "word14", "word15"] },
   ];
 
   const navigate = useNavigate();
@@ -68,14 +68,13 @@ const Welcome = () => {
   const [groupsList, setGroupsList] = useState([]);
 
   useEffect(() => {
-    sessionStorage.setItem('score', "0,0,0,0");
-
-    const storedGroups = sessionStorage.getItem('groupsList');
+    const storedGroups = sessionStorage.getItem("groupsList");
     if (storedGroups) {
       setGroupsList(JSON.parse(storedGroups));
     } else {
+      sessionStorage.setItem("score", "0,0,0,0");
       const newGroupsList = splitIntoMultipleArrays(names, numberOfGroups);
-      sessionStorage.setItem('groupsList', JSON.stringify(newGroupsList));
+      sessionStorage.setItem("groupsList", JSON.stringify(newGroupsList));
       setGroupsList(newGroupsList);
     }
   }, []);

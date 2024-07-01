@@ -28,8 +28,15 @@ const App = () => {
   const [finalScore, setFinalScore] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const [currentGroupScores, setCurrentGroupScores] = useState(new Array(4).fill(0));
-  const [groupNames, setGroupNames] = useState(['קבוצה 1', 'קבוצה 2', 'קבוצה 3', 'קבוצה 4']);
+  const [currentGroupScores, setCurrentGroupScores] = useState(
+    new Array(4).fill(0)
+  );
+  const [groupNames, setGroupNames] = useState([
+    "קבוצה 1",
+    "קבוצה 2",
+    "קבוצה 3",
+    "קבוצה 4",
+  ]);
   const [currentGroupName, setCurrentGroupName] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,10 +53,10 @@ const App = () => {
   };
 
   const updateGroupScore = (groupIndex, score) => {
-    const scores = sessionStorage.getItem('score').split(',').map(Number);
+    const scores = sessionStorage.getItem("score").split(",").map(Number);
     const newScores = [...scores];
     newScores[groupIndex] += score;
-    sessionStorage.setItem('score', newScores);
+    sessionStorage.setItem("score", newScores);
   };
 
   const inputRefs = useRef(
@@ -208,7 +215,11 @@ const App = () => {
               <Button className="my-button" onClick={showModal}>
                 עבור למילה הבא
               </Button>
-              <Modal open={isModalOpen} onOk={nextLevel} onCancel={handleCancel}>
+              <Modal
+                open={isModalOpen}
+                onOk={nextLevel}
+                onCancel={handleCancel}
+              >
                 <Results groups={groupNames} scores={currentGroupScores} />
               </Modal>
             </div>
