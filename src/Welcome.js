@@ -131,9 +131,9 @@ const Welcome = () => {
 
   const groupNames = [
     "לוחמי הבאגים",
-    "סיירת קפה ומאפה",
+    "סיירת האפיונים",
     "אבירי המקלדת",
-    "ציידי החושך",
+    "מפתחי התקלות",
   ];
 
   const numberOfGroups = groupNames.length;
