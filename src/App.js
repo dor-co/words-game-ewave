@@ -4,15 +4,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./index.scss";
 import Results from "./Results";
 
-const attempts = 6;
-const numberOfGroups = 4;
-
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { game } = location.state;
+  const { game, groupNames } = location.state;
+  const attempts = 6;
+
   const [level, setLevel] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [currentAttempt, setCurrentAttempt] = useState(0);
+  const [isWordDone, setIsWordDone] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [currentGroupName, setCurrentGroupName] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputs, setInputs] = useState(
     Array(attempts)
       .fill("")
@@ -23,42 +27,6 @@ const App = () => {
       .fill("")
       .map(() => Array(game.words[level].length).fill(""))
   );
-  const [currentAttempt, setCurrentAttempt] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [finalScore, setFinalScore] = useState(null);
-  const [messageApi, contextHolder] = message.useMessage();
-
-  const [currentGroupScores, setCurrentGroupScores] = useState(
-    new Array(4).fill(0)
-  );
-  const [groupNames, setGroupNames] = useState([
-    "קבוצה 1",
-    "קבוצה 2",
-    "קבוצה 3",
-    "קבוצה 4",
-  ]);
-  const [currentGroupName, setCurrentGroupName] = useState("");
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const updateGroupScore = (groupIndex, score) => {
-    const scores = sessionStorage.getItem("score").split(",").map(Number);
-    const newScores = [...scores];
-    newScores[groupIndex] += score;
-    sessionStorage.setItem("score", newScores);
-  };
-
   const inputRefs = useRef(
     Array(attempts)
       .fill("")
@@ -69,13 +37,31 @@ const App = () => {
       )
   );
 
+  useEffect(() => {
+    setCurrentGroupName(groupNames[level % groupNames.length]);
+  }, [level, groupNames]);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const updateGroupScore = (groupIndex, score) => {
+    const scores = localStorage.getItem("score").split(",").map(Number);
+    const newScores = [...scores];
+    newScores[groupIndex] += score;
+    localStorage.setItem("score", newScores);
+  };
+
   const handleChange = (rowIndex, colIndex, event) => {
-    if (currentAttempt !== rowIndex) return; // Prevent editing previous attempts
+    if (currentAttempt !== rowIndex) return;
     const newInputs = [...inputs];
     newInputs[rowIndex][colIndex] = event.target.value;
     setInputs(newInputs);
 
-    // Move to the next input if available
     if (colIndex < game.words[level].length - 1) {
       const nextInputRef = inputRefs.current[rowIndex][colIndex + 1];
       if (nextInputRef && nextInputRef.current) {
@@ -83,10 +69,6 @@ const App = () => {
       }
     }
   };
-
-  useEffect(() => {
-    setCurrentGroupName(groupNames[level % groupNames.length]);
-  }, [level, groupNames]);
 
   const checkInputs = () => {
     if (currentAttempt >= attempts) return;
@@ -116,14 +98,13 @@ const App = () => {
 
     if (currentInputs.join("") === game.words[level]) {
       const score = calculateScore(currentAttempt);
-      setFinalScore(score);
 
-      const groupIndex = level % numberOfGroups;
+      const groupIndex = level % groupNames.length;
       updateGroupScore(groupIndex, score);
 
-      setGameOver(true);
+      setIsWordDone(true);
     } else if (currentAttempt === attempts - 1) {
-      setGameOver(true);
+      setIsWordDone(true);
     }
 
     setCurrentAttempt(currentAttempt + 1);
@@ -148,10 +129,8 @@ const App = () => {
           .map(() => Array(game.words[nextLevel].length).fill(""))
       );
       setCurrentAttempt(0);
-      setGameOver(false);
-      setFinalScore(null);
+      setIsWordDone(false);
 
-      // Reset inputRefs for new level
       inputRefs.current = Array(attempts)
         .fill("")
         .map(() =>
@@ -160,7 +139,6 @@ const App = () => {
             .map(() => React.createRef())
         );
 
-      // Focus on the first input of the new level
       if (inputRefs.current[0][0] && inputRefs.current[0][0].current) {
         inputRefs.current[0][0].current.focus();
       }
@@ -194,15 +172,15 @@ const App = () => {
                   onChange={(e) => handleChange(rowIndex, colIndex, e)}
                   style={{ borderColor: results[rowIndex][colIndex] }}
                   maxLength={1}
-                  disabled={rowIndex !== currentAttempt || gameOver}
+                  disabled={rowIndex !== currentAttempt || isWordDone}
                   autoFocus={
-                    rowIndex === currentAttempt && colIndex === 0 && !gameOver
-                  } // Autofocus on the first input of current attempt
+                    rowIndex === currentAttempt && colIndex === 0 && !isWordDone
+                  }
                 />
               ))}
             </div>
           ))}
-          {!gameOver ? (
+          {!isWordDone ? (
             <Button
               className="my-button"
               onClick={checkInputs}
@@ -220,7 +198,7 @@ const App = () => {
                 onOk={nextLevel}
                 onCancel={handleCancel}
               >
-                <Results groups={groupNames} scores={currentGroupScores} />
+                <Results groups={groupNames} />
               </Modal>
             </div>
           )}

@@ -1,51 +1,158 @@
-import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Results from "./Results";
+import { Button } from "antd";
 
 const Welcome = () => {
   const names = [
-    "אברהם",
-    "יצחק",
-    "יעקב",
-    "משה",
-    "אהרן",
-    "דוד",
-    "שלמה",
-    "יוסף",
-    "יהושע",
-    "שמואל",
-    "אדם",
-    "חוה",
-    "שרה",
-    "רבקה",
-    "רחל",
-    "לאה",
-    "מרים",
-    "חנה",
-    "אסתר",
-    "רות",
-    "נח",
+    "שרון",
+    "רחלי",
+    "ענבל",
+    "אליצור",
+    "ניר",
+    "טל",
+    "מרינה",
+    "הדר",
+    "אמיר",
+    "תהילה",
+    "יובל",
+    "מאי",
+    "אורי",
     "דניאל",
-    "עזרא",
-    "נחמיה",
-    "ישעיהו",
-    "ירמיהו",
-    "יחזקאל",
-    "אליהו",
+    "עדי",
+    "אלכס",
+    "דרור",
     "יהונתן",
-    "גדעון",
+    "שרה",
   ];
 
   const gamesList = [
-    { category: "Category 1", words: ["wo", "word2"] },
-    { category: "Category 2", words: ["word-asd4", "dsword5", "w6"] },
-    { category: "Category 3", words: ["worasdd7", "word8", "wordsds9"] },
-    { category: "Category 4", words: ["d10", "word11", "word12"] },
-    { category: "Category 5", words: ["word13", "word14", "word15"] },
+    {
+      category: "לקוחות",
+      words: [
+        "נגה",
+        "מזרחי",
+        "תעסוקה",
+        "פיס",
+        "בלורן",
+        "שלמה",
+        "לאומית",
+        "משכל",
+        "מכבי",
+        "יורודרייב",
+        "איכולוב",
+        "שמיר",
+        "ירושלים",
+        "מקדולנדס",
+        "עמינח",
+        "נתע",
+        "ויזה",
+        "דיפלומט",
+        "אלביט",
+        "פלאפון",
+        "קליקפדיה",
+        "רופין",
+        "פזגז",
+        "איוויב",
+      ],
+    },
+    {
+      category: "מסעדות בסיבוס",
+      words: [
+        "שניצלס",
+        "צוקה",
+        "קאמי",
+        "אינסלטה",
+        "ברונו",
+        "גונודלס",
+        "גירף",
+        "נגיסה",
+        "ריבר",
+        "גפניקה",
+        "טיטו",
+        "הממלכה",
+      ],
+    },
+    {
+      category: "5 אותיות",
+      words: [
+        "חברים",
+        "ספרים",
+        "גלידה",
+        "משפחה",
+        "חופשה",
+        "סיבוס",
+        "שממית",
+        "משתמש",
+        "שירים",
+        "תקווה",
+        "פיתוח",
+        "ניהול",
+        "מושלם",
+        "בדיקה",
+        "שיחות",
+        "מימון",
+        "עסקית",
+        "תוצאה",
+        "התקנה",
+        "ברקוד",
+        "משימה",
+        "קישור",
+        "חיפוש",
+        "באגים",
+      ],
+    },
+    {
+      category: "ערים",
+      words: [
+        "אילת",
+        "ירשולים",
+        "מודיעין",
+        "דימונה",
+        "נהריה",
+        "הרצליה",
+        "רעננה",
+        "נתניה",
+        "חולון",
+        "רחובות",
+        "ירוחם",
+        "ערד",
+        "כרמיאל",
+        "מעלות",
+        "חיפה",
+        "בנימינה",
+        "אשדוד",
+        "אופקים",
+        "קיסריה",
+        "עפולה",
+      ],
+    },
   ];
 
+  const groupNames = [
+    "לוחמי הבאגים",
+    "סיירת קפה ומאפה",
+    "אבירי המקלדת",
+    "ציידי החושך",
+  ];
+
+  const numberOfGroups = groupNames.length;
+
   const navigate = useNavigate();
-  const numberOfGroups = 4;
+
+  const [groupsList, setGroupsList] = useState([]);
+
+  useEffect(() => {
+    const storedGroups = localStorage.getItem("groupsList");
+    if (storedGroups) {
+      setGroupsList(JSON.parse(storedGroups));
+    } else {
+      localStorage.setItem("score", "0,0,0,0");
+      const newGroupsList = splitIntoMultipleArrays(names, numberOfGroups);
+      localStorage.setItem("groupsList", JSON.stringify(newGroupsList));
+      setGroupsList(newGroupsList);
+    }
+  }, []);
 
   const shuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -65,26 +172,12 @@ const Welcome = () => {
     return result;
   };
 
-  const [groupsList, setGroupsList] = useState([]);
-
-  useEffect(() => {
-    const storedGroups = sessionStorage.getItem("groupsList");
-    if (storedGroups) {
-      setGroupsList(JSON.parse(storedGroups));
-    } else {
-      sessionStorage.setItem("score", "0,0,0,0");
-      const newGroupsList = splitIntoMultipleArrays(names, numberOfGroups);
-      sessionStorage.setItem("groupsList", JSON.stringify(newGroupsList));
-      setGroupsList(newGroupsList);
-    }
-  }, []);
-
   const onStartGame = (game) => {
-    navigate("/game", { state: { game } });
+    navigate("/game", { state: { game, groupNames } });
   };
 
   return (
-    <div className="lobby-container">
+    <div className="lobby-container container">
       <h1 className="my-h1">לובי משחק</h1>
       <h2 className="my-h2">קבוצות:</h2>
       <div className="groups-container">
@@ -109,6 +202,7 @@ const Welcome = () => {
           </Button>
         ))}
       </div>
+      <Results groups={groupNames} isHideTitle={true} isWideTable={true} />
     </div>
   );
 };

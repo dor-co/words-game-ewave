@@ -180,7 +180,11 @@ body {
 
   .score-cell {
     font-weight: bold;
-    color:  #DAA520;
+    color: #daa520;
+  }
+
+  &.results-wide-table {
+    width: 400px;
+    margin-top: 50px;
   }
 }
-
