@@ -184,7 +184,7 @@ const Welcome = () => {
       <div className="groups-container">
         {groupsList.map((group, groupIndex) => (
           <div key={groupIndex} className="group-container">
-            <span className="groud-title">קבוצה {groupIndex + 1}</span>
+            <span className="groud-title">{groupNames[groupIndex]}</span>
             {group.map((name, nameIndex) => (
               <span key={nameIndex}>{name} </span>
             ))}

@@ -157,52 +157,56 @@ const App = () => {
       <Button onClick={onBackToLobby} className="back-to-lobby-btn">
         חזרה ללובי
       </Button>
-      <h1 className="my-h1">קטגוריה: {game.category}</h1>
-      <h2 className="my-h2">קבוצה משחקת: {currentGroupName}</h2>
       {!isGameOver ? (
-        <div className="input-grid">
-          {inputs.map((row, rowIndex) => (
-            <div key={rowIndex} className="input-row">
-              {row.map((input, colIndex) => (
-                <input
-                  className="pin-input"
-                  key={colIndex}
-                  ref={inputRefs.current[rowIndex][colIndex]}
-                  value={input}
-                  onChange={(e) => handleChange(rowIndex, colIndex, e)}
-                  style={{ borderColor: results[rowIndex][colIndex] }}
-                  maxLength={1}
-                  disabled={rowIndex !== currentAttempt || isWordDone}
-                  autoFocus={
-                    rowIndex === currentAttempt && colIndex === 0 && !isWordDone
-                  }
-                />
-              ))}
-            </div>
-          ))}
-          {!isWordDone ? (
-            <Button
-              className="my-button"
-              onClick={checkInputs}
-              disabled={currentAttempt >= attempts}
-            >
-              בדוק מילה
-            </Button>
-          ) : (
-            <div>
-              <Button className="my-button" onClick={showModal}>
-                עבור למילה הבא
-              </Button>
-              <Modal
-                open={isModalOpen}
-                onOk={nextLevel}
-                onCancel={handleCancel}
+        <>
+          <h1 className="my-h1">קטגוריה: {game.category}</h1>
+          <h2 className="my-h2">קבוצה משחקת: {currentGroupName}</h2>
+          <div className="input-grid">
+            {inputs.map((row, rowIndex) => (
+              <div key={rowIndex} className="input-row">
+                {row.map((input, colIndex) => (
+                  <input
+                    className="pin-input"
+                    key={colIndex}
+                    ref={inputRefs.current[rowIndex][colIndex]}
+                    value={input}
+                    onChange={(e) => handleChange(rowIndex, colIndex, e)}
+                    style={{ borderColor: results[rowIndex][colIndex] }}
+                    maxLength={1}
+                    disabled={rowIndex !== currentAttempt || isWordDone}
+                    autoFocus={
+                      rowIndex === currentAttempt &&
+                      colIndex === 0 &&
+                      !isWordDone
+                    }
+                  />
+                ))}
+              </div>
+            ))}
+            {!isWordDone ? (
+              <Button
+                className="my-button"
+                onClick={checkInputs}
+                disabled={currentAttempt >= attempts}
               >
-                <Results groups={groupNames} />
-              </Modal>
-            </div>
-          )}
-        </div>
+                בדוק מילה
+              </Button>
+            ) : (
+              <div>
+                <Button className="my-button" onClick={showModal}>
+                  עבור למילה הבא
+                </Button>
+                <Modal
+                  open={isModalOpen}
+                  onOk={nextLevel}
+                  onCancel={handleCancel}
+                >
+                  <Results groups={groupNames} />
+                </Modal>
+              </div>
+            )}
+          </div>
+        </>
       ) : (
         <h2 className="game-over-title">כל הכבוד! המשחק הסתיים :)</h2>
       )}
