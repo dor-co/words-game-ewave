@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/words-game-ewave/static/css/main.b423790f.css",
+    "main.css": "/words-game-ewave/static/css/main.7b025cd1.css",
     "main.js": "/words-game-ewave/static/js/main.ad838adb.js",
     "static/js/453.84a950d2.chunk.js": "/words-game-ewave/static/js/453.84a950d2.chunk.js",
-    "static/media/about.png": "/words-game-ewave/static/media/about.7ca519af32a4e89225c9.png",
+    "static/media/ewave-building.png": "/words-game-ewave/static/media/ewave-building.3d9c44bde0c1d849855a.png",
     "index.html": "/words-game-ewave/index.html",
-    "main.b423790f.css.map": "/words-game-ewave/static/css/main.b423790f.css.map",
+    "main.7b025cd1.css.map": "/words-game-ewave/static/css/main.7b025cd1.css.map",
     "main.ad838adb.js.map": "/words-game-ewave/static/js/main.ad838adb.js.map",
     "453.84a950d2.chunk.js.map": "/words-game-ewave/static/js/453.84a950d2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b423790f.css",
+    "static/css/main.7b025cd1.css",
     "static/js/main.ad838adb.js"
   ]
 }
